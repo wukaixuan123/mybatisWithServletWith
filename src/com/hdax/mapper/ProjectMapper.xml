@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 如果需要访问这条sql语，需要通过其唯一标识访问到 唯一标识就是 namespace+id的组合 -->
+<mapper namespace="com.hdax.mapper.ProjectMapper">
+    <!-- mapper标签下有select、update、delete、insert，根据你要执行的sql语句选择正确的标签 -->
+    <select id="getProject"  resultMap="AllProjectInfo" >
+       select pro.id,projectName,Executor,Description,orderLevel,createDate,work.id from Project pro inner join workorder work on work.projectId = pro.id
+    </select>
+<!--    <resultMap id="AllProjectInfo" type="Project">-->
+<!--        <id property="id" column="proId"/>-->
+<!--        <result property="projectName" column="projectName"/>-->
+<!--        <collection property="workorder" ofType="Workorder">-->
+<!--            <id column="workId " property="projectId"></id>-->
+<!--            <result property="executor" column="Executor"/>-->
+<!--            <result property="description" column="Description"/>-->
+<!--            <result property="orderLevel" column="orderLevel"/>-->
+<!--            <result property="createDate" column="createDate"/>-->
+<!--        </collection>-->
+<!--    </resultMap>-->
+<!--    可能会出现映射不到值得情况 使用别名-->
+    <resultMap id="AllProjectInfo" type="Project">
+        <id property="id" column="pro.id"/>
+        <result property="projectName" column="projectName"/>
+        <association property="workorder" javaType="com.hdax.pojo.Workorder">
+                        <id column="work.id " property="id"></id>
+                        <result property="executor" column="Executor"/>
+                        <result property="description" column="Description"/>
+                        <result property="orderLevel" column="orderLevel"/>
+                        <result property="createDate" column="createDate"/>
+        </association>
+    </resultMap>
+    <select id="queryAllCount" parameterType="com.hdax.until.pageConfig">
+        select count(*) from project  limit #{startIndex},#{limit}
+    </select>
+    <select id="queryAllProject" resultType="Project">
+        select * from project
+    </select>
+    <insert id="insertWorkOrder" parameterType="Workorder">
+        insert into workorder (projectId,Executor,Description,orderLevel,createDate) values (#{projectId},#{executor},#{description},#{orderLevel},now())
+    </insert>
+</mapper>
